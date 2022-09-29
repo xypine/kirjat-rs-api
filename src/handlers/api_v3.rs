@@ -38,7 +38,7 @@ pub async fn query_v3(
         if let Ok(books) = queryresult {
             out.insert(book_name, QueryV2Result::Ok(books));
         } else if let Err(error) = queryresult {
-            println!(error);
+            println!("{}", error);
             out.insert(book_name, QueryV2Result::Error(error.to_string()));
         }
     }
