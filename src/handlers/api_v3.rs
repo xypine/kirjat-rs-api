@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Mutex};
+use std::collections::HashMap;
 
 use actix_web::{
     get,
@@ -6,7 +6,6 @@ use actix_web::{
     web::{Data, Query},
     HttpResponse,
 };
-use kirjat::Cache;
 use serde::{Deserialize, Serialize};
 
 use crate::AppState;
@@ -39,6 +38,7 @@ pub async fn query_v3(
         if let Ok(books) = queryresult {
             out.insert(book_name, QueryV2Result::Ok(books));
         } else if let Err(error) = queryresult {
+            println!(error);
             out.insert(book_name, QueryV2Result::Error(error.to_string()));
         }
     }

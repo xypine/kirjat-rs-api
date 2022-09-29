@@ -27,6 +27,9 @@ async fn main() -> std::io::Result<()> {
         cache: Mutex::new(cache),
     });
 
+    let http_bind = std::env::var("HTTP_BIND").unwrap_or_else(|_| "0.0.0.0:8080".to_string());
+    println!("Starting to listen on {}:...", http_bind);
+
     HttpServer::new(move || {
         App::new()
             .app_data(app_state.clone())
@@ -37,7 +40,7 @@ async fn main() -> std::io::Result<()> {
             .service(greet)
             .service(handlers::api_v3::query_v3)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(http_bind)?
     .run()
     .await
 }
