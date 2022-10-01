@@ -16,8 +16,17 @@ COPY . .
 # Build (install) the actual binaries
 RUN cargo install --path .
 
+
+###############################################################################
+
 # Runtime image
 FROM debian:bullseye-slim
+
+# Install components needed for ssl
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates
+
+RUN update-ca-certificates
 
 # Run as "app" user
 RUN useradd -ms /bin/bash app

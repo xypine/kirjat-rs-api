@@ -35,11 +35,15 @@ pub async fn query_v3(
     for book_name in book_names {
         let name = book_name.to_string();
         let queryresult = kirjat::search_book_from_all_sources(&name, &Some(&mut cache_live)).await;
-        if let Ok(books) = queryresult {
-            out.insert(book_name, QueryV2Result::Ok(books));
-        } else if let Err(error) = queryresult {
-            println!("{}", error);
-            out.insert(book_name, QueryV2Result::Error(error.to_string()));
+        match queryresult {
+            Ok(books) => {
+                out.insert(book_name, QueryV2Result::Ok(books));
+            }
+            Err(error) => match error {
+                _ => {
+                    out.insert(book_name, QueryV2Result::Error(error.to_string()));
+                }
+            },
         }
     }
 
