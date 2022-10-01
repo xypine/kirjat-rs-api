@@ -39,6 +39,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(greet)
             .service(handlers::api_v3::query_v3)
+            .service(handlers::api_v3::query_v3_source)
     })
     .bind(http_bind)?
     .run()

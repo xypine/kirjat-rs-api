@@ -11,7 +11,7 @@ env_logger = "0.9.1"
 actix-cors = "0.6.3"
 serde = "1"
 anyhow = { version = "1", features = ["backtrace"] }
-kirjat-rs = { version = "0.3.0", default_features = false, features = [ ] }
+kirjat-rs = { version = "0.4.0", default_features = false, features = [ ] }
 
 [profile.release]
 debug = true
