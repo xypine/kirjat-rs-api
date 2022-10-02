@@ -1,7 +1,10 @@
 use std::sync::Mutex;
 
 use actix_cors::Cors;
-use actix_web::{get, middleware, web::Data, App, HttpServer, Responder};
+use actix_web::{
+    get, http::Error, middleware, web::Data, App, HttpResponse, HttpServer, Responder,
+};
+use serde::{Deserialize, Serialize};
 
 use kirjat::Cache;
 
@@ -11,10 +14,24 @@ pub struct AppState {
     pub cache: Mutex<Cache>,
 }
 
+#[derive(Deserialize, Serialize, Debug)]
+pub struct Stats {
+    pub pages_cached: usize,
+}
+#[derive(Serialize, Debug)]
+pub struct Greet {
+    pub endpoints: [&'static str; 3],
+    pub stats: Stats,
+}
 #[get("/")]
-async fn greet(app_state: Data<AppState>) -> impl Responder {
+async fn greet(app_state: Data<AppState>) -> Result<HttpResponse, Error> {
     let cache = &app_state.cache;
-    format!("{} items cached", cache.lock().unwrap().entry_count())
+    let pages_cached = cache.lock().unwrap().entry_count() as usize;
+    let out = Greet {
+        stats: Stats { pages_cached },
+        endpoints: ["/", "/api/v3/search", "/api/v3/search/source/{source}"],
+    };
+    return Ok::<HttpResponse, Error>(HttpResponse::Ok().json(out));
 }
 
 #[actix_web::main] // or #[tokio::main]
