@@ -966,9 +966,9 @@ dependencies = [
 
 [[package]]
 name = "kirjat-rs"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea69ca24e69c890375efe6af648db6dc8d68f17e02438a9f85adaf87eda02bbd"
+checksum = "c59bf2bcb6d4d229754a156f8cc8121edf9cbbe109ce3805317a71dfe50080ed"
 dependencies = [
  "anyhow",
  "async-trait",
