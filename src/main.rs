@@ -1,9 +1,7 @@
 use std::sync::Mutex;
 
 use actix_cors::Cors;
-use actix_web::{
-    get, http::Error, middleware, web::Data, App, HttpResponse, HttpServer, Responder,
-};
+use actix_web::{get, http::Error, middleware, web::Data, App, HttpResponse, HttpServer};
 use serde::{Deserialize, Serialize};
 
 use kirjat::Cache;
@@ -20,8 +18,10 @@ pub struct Stats {
 }
 #[derive(Serialize, Debug)]
 pub struct Greet {
-    pub endpoints: [&'static str; 3],
+    pub endpoints: [&'static str; 4],
     pub stats: Stats,
+    pub app_version: &'static str,
+    pub app_license: &'static str,
 }
 #[get("/")]
 async fn greet(app_state: Data<AppState>) -> Result<HttpResponse, Error> {
@@ -29,7 +29,14 @@ async fn greet(app_state: Data<AppState>) -> Result<HttpResponse, Error> {
     let pages_cached = cache.lock().unwrap().entry_count() as usize;
     let out = Greet {
         stats: Stats { pages_cached },
-        endpoints: ["/", "/api/v3/search", "/api/v3/search/source/{source}"],
+        endpoints: [
+            "/",
+            "/api/v3/search",
+            "/api/v3/search/source/{source}",
+            "/api/v3/cached_pages_v3",
+        ],
+        app_version: env!("CARGO_PKG_VERSION"),
+        app_license: env!("CARGO_PKG_LICENSE"),
     };
     return Ok::<HttpResponse, Error>(HttpResponse::Ok().json(out));
 }
@@ -57,6 +64,7 @@ async fn main() -> std::io::Result<()> {
             .service(greet)
             .service(handlers::api_v3::query_v3)
             .service(handlers::api_v3::query_v3_source)
+            .service(handlers::api_v3::cached_pages_v3)
     })
     .bind(http_bind)?
     .run()

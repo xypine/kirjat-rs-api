@@ -85,3 +85,16 @@ pub async fn query_v3_source(
 
     return Ok(HttpResponse::Ok().json(out));
 }
+
+#[get("/api/v3/cached_pages")]
+pub async fn cached_pages_v3(app_state: Data<AppState>) -> Result<HttpResponse, Error> {
+    let cache = &app_state.cache;
+    let cache_live = cache.lock().unwrap().clone();
+
+    return Ok(HttpResponse::Ok().json(
+        cache_live
+            .iter()
+            .map(|(k, _v)| (*k).clone())
+            .collect::<Vec<String>>(),
+    ));
+}
