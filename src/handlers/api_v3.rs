@@ -15,7 +15,7 @@ pub struct QueryV3 {
     names: String,
 }
 #[derive(Deserialize, Serialize, Debug)]
-pub enum QueryV2Result {
+pub enum QueryV3Result {
     #[serde(rename(serialize = "results"))]
     Ok(Vec<kirjat::structs::kirja::Kirja>),
     #[serde(rename(serialize = "error"))]
@@ -37,11 +37,11 @@ pub async fn query_v3(
         let queryresult = kirjat::search_book_from_all_sources(&name, &Some(&mut cache_live)).await;
         match queryresult {
             Ok(books) => {
-                out.insert(book_name, QueryV2Result::Ok(books));
+                out.insert(book_name, QueryV3Result::Ok(books));
             }
             Err(error) => match error {
                 _ => {
-                    out.insert(book_name, QueryV2Result::Error(error.to_string()));
+                    out.insert(book_name, QueryV3Result::Error(error.to_string()));
                 }
             },
         }
@@ -70,11 +70,11 @@ pub async fn query_v3_source(
         let queryresult = kirjat::search_book(&name, *source, &Some(&mut cache_live)).await;
         match queryresult {
             Ok(books) => {
-                out.insert(book_name, QueryV2Result::Ok(books));
+                out.insert(book_name, QueryV3Result::Ok(books));
             }
             Err(error) => match error {
                 _ => {
-                    out.insert(book_name, QueryV2Result::Error(error.to_string()));
+                    out.insert(book_name, QueryV3Result::Error(error.to_string()));
                 }
             },
         }
