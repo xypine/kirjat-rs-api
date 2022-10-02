@@ -36,7 +36,8 @@ pub async fn query_v3(
         let name = book_name.to_string();
         let queryresult = kirjat::search_book_from_all_sources(&name, &Some(&mut cache_live)).await;
         match queryresult {
-            Ok(books) => {
+            Ok(mut books) => {
+                sort(&mut books, name);
                 out.insert(book_name, QueryV3Result::Ok(books));
             }
             Err(error) => match error {
@@ -69,7 +70,8 @@ pub async fn query_v3_source(
         let name = book_name.to_string();
         let queryresult = kirjat::search_book(&name, *source, &Some(&mut cache_live)).await;
         match queryresult {
-            Ok(books) => {
+            Ok(mut books) => {
+                sort(&mut books, name);
                 out.insert(book_name, QueryV3Result::Ok(books));
             }
             Err(error) => match error {
@@ -97,4 +99,15 @@ pub async fn cached_pages_v3(app_state: Data<AppState>) -> Result<HttpResponse, 
             .map(|(k, _v)| (*k).clone())
             .collect::<Vec<String>>(),
     ));
+}
+
+pub fn sort(books: &mut Vec<kirjat::structs::kirja::Kirja>, perfect: String) {
+    books.sort_by(|b, a| 
+        strsim::normalized_damerau_levenshtein(&a.name, &perfect)
+            .abs()
+            .total_cmp(
+                &strsim::normalized_damerau_levenshtein(&b.name, &perfect)
+                .abs()
+            )
+    );
 }

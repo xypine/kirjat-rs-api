@@ -990,6 +990,7 @@ dependencies = [
  "env_logger",
  "kirjat-rs",
  "serde",
+ "strsim",
 ]
 
 [[package]]
@@ -1898,6 +1899,12 @@ dependencies = [
  "proc-macro2",
  "quote",
 ]
+
+[[package]]
+name = "strsim"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "syn"
