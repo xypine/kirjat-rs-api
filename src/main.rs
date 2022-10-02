@@ -33,7 +33,7 @@ async fn greet(app_state: Data<AppState>) -> Result<HttpResponse, Error> {
             "/",
             "/api/v3/search",
             "/api/v3/search/source/{source}",
-            "/api/v3/cached_pages_v3",
+            "/api/v3/cached_pages",
         ],
         app_version: env!("CARGO_PKG_VERSION"),
         app_license: env!("CARGO_PKG_LICENSE"),
