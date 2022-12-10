@@ -101,13 +101,16 @@ pub async fn cached_pages_v3(app_state: Data<AppState>) -> Result<HttpResponse, 
     ));
 }
 
+pub fn score_result(result: &kirjat::structs::kirja::Kirja, query: &String) -> f64 {
+    ((1.0 - (strsim::normalized_damerau_levenshtein(&result.name, query).abs()) * 9.0)
+        + (result
+            .get_min_price()
+            .unwrap_or(kirjat::structs::currency::Currency { euro_cents: 20_000 })
+            .to_euros()
+            * 0.1))
+        / 10.0
+}
+
 pub fn sort(books: &mut Vec<kirjat::structs::kirja::Kirja>, perfect: String) {
-    books.sort_by(|b, a| 
-        strsim::normalized_damerau_levenshtein(&a.name, &perfect)
-            .abs()
-            .total_cmp(
-                &strsim::normalized_damerau_levenshtein(&b.name, &perfect)
-                .abs()
-            )
-    );
+    books.sort_by(|a, b| score_result(a, &perfect).total_cmp(&score_result(b, &perfect)));
 }

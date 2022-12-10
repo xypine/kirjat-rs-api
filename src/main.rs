@@ -1,9 +1,11 @@
 use std::sync::Mutex;
+use std::time::Duration;
 
 use actix_cors::Cors;
 use actix_web::{get, http::Error, middleware, web::Data, App, HttpResponse, HttpServer};
 use serde::{Deserialize, Serialize};
 
+pub const MAX_CACHE_DURATION: Duration = Duration::from_secs(86_400); // 24 hours
 use kirjat::Cache;
 
 mod handlers;
@@ -46,7 +48,10 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "actix_web=debug");
     env_logger::init();
 
-    let cache = Cache::new(10_000);
+    let cache = Cache::builder()
+        .max_capacity(10_000)
+        .time_to_live(MAX_CACHE_DURATION)
+        .build();
     let app_state = Data::new(AppState {
         cache: Mutex::new(cache),
     });
