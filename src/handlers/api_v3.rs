@@ -31,7 +31,7 @@ pub async fn query_v3(
 
     let mut out = HashMap::new();
 
-    let book_names: Vec<&str> = query.names.split(",").collect();
+    let book_names: Vec<&str> = query.names.split(",").map(|name| name.trim()).collect();
     for book_name in book_names {
         let name = book_name.to_string();
         let queryresult = kirjat::search_book_from_all_sources(&name, &Some(&mut cache_live)).await;
@@ -65,7 +65,7 @@ pub async fn query_v3_source(
 
     let mut out = HashMap::new();
 
-    let book_names: Vec<&str> = query.names.split(",").collect();
+    let book_names: Vec<&str> = query.names.split(",").map(|name| name.trim()).collect();
     for book_name in book_names {
         let name = book_name.to_string();
         let queryresult = kirjat::search_book(&name, *source, &Some(&mut cache_live)).await;
