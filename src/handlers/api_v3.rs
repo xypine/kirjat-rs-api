@@ -15,11 +15,9 @@ pub struct QueryV3 {
     names: String,
 }
 #[derive(Deserialize, Serialize, Debug)]
-pub enum QueryV3Result {
-    #[serde(rename(serialize = "results"))]
-    Ok(Vec<kirjat::structs::kirja::Kirja>),
-    #[serde(rename(serialize = "error"))]
-    Error(String),
+pub struct QueryV3Result {
+    pub results: Vec<kirjat::structs::kirja::Kirja>,
+    pub errors: Vec<String>,
 }
 #[get("/api/v3/search")]
 pub async fn query_v3(
@@ -35,17 +33,22 @@ pub async fn query_v3(
     for book_name in book_names {
         let name = book_name.to_string();
         let queryresult = kirjat::search_book_from_all_sources(&name, &Some(&mut cache_live)).await;
-        match queryresult {
-            Ok(mut books) => {
-                sort(&mut books, name);
-                out.insert(book_name, QueryV3Result::Ok(books));
-            }
-            Err(error) => match error {
-                _ => {
-                    out.insert(book_name, QueryV3Result::Error(error.to_string()));
+        let mut results = vec![];
+        let mut errors = vec![];
+        for result in queryresult {
+            match result {
+                Ok(mut books) => {
+                    results.append(&mut books);
+                    sort(&mut results, name.clone());
                 }
-            },
+                Err(error) => match error {
+                    _ => {
+                        errors.push(error.to_string());
+                    }
+                },
+            }
         }
+        out.insert(book_name, QueryV3Result { results, errors });
     }
 
     // Update cache
@@ -69,17 +72,20 @@ pub async fn query_v3_source(
     for book_name in book_names {
         let name = book_name.to_string();
         let queryresult = kirjat::search_book(&name, *source, &Some(&mut cache_live)).await;
+        let mut results = vec![];
+        let mut errors = vec![];
         match queryresult {
             Ok(mut books) => {
-                sort(&mut books, name);
-                out.insert(book_name, QueryV3Result::Ok(books));
+                results.append(&mut books);
+                sort(&mut results, name.clone());
             }
             Err(error) => match error {
                 _ => {
-                    out.insert(book_name, QueryV3Result::Error(error.to_string()));
+                    errors.push(error.to_string());
                 }
             },
         }
+        out.insert(book_name, QueryV3Result { results, errors });
     }
 
     // Update cache

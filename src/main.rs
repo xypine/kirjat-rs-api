@@ -57,7 +57,7 @@ async fn main() -> std::io::Result<()> {
     });
 
     let http_bind = std::env::var("HTTP_BIND").unwrap_or_else(|_| "0.0.0.0:8080".to_string());
-    println!("Starting to listen on {}:...", http_bind);
+    println!("Starting to listen on http://{}", http_bind);
 
     HttpServer::new(move || {
         App::new()
