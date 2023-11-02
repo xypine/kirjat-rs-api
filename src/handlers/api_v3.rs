@@ -61,7 +61,7 @@ pub async fn query_v3(
 pub async fn query_v3_source(
     app_state: Data<AppState>,
     query: Query<QueryV3>,
-    source: Path<kirjat::sources::Sources>,
+    source: Path<kirjat::sources::BuiltInSource>,
 ) -> Result<HttpResponse, Error> {
     let cache = &app_state.cache;
     let mut cache_live = cache.lock().unwrap().clone();
@@ -71,7 +71,12 @@ pub async fn query_v3_source(
     let book_names: Vec<&str> = query.names.split(",").map(|name| name.trim()).collect();
     for book_name in book_names {
         let name = book_name.to_string();
-        let queryresult = kirjat::search_book(&name, *source, &Some(&mut cache_live)).await;
+        let queryresult = kirjat::search_book(
+            &name,
+            &kirjat::sources::get_instance(*source),
+            &Some(&mut cache_live),
+        )
+        .await;
         let mut results = vec![];
         let mut errors = vec![];
         match queryresult {
